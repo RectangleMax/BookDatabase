@@ -4,21 +4,25 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <set>
+#include <boost/container/flat_set.hpp>
 
 #include "book.hpp"
 #include "concepts.hpp"
 #include "heterogeneous_lookup.hpp"
 
+
 namespace bookdb {
 
-template <BookContainerLike BookContainer = std::vector<Book>>
+// template <BookContainerLike BookContainer = std::vector<Book>> // 
+template <BookContainerLike BookContainer = boost::container::flat_multiset<Book, CompareByAuthor>>
 class BookDatabase {
 public:
     // Type aliases
 
     // Ваш код здесь
 
-    using AuthorContainer = BookContainer /* Ваш код здесь */;
+    using AuthorContainer = std::set<std::string>; // BookContainer /* Ваш код здесь */;
 
     BookDatabase() = default;
 
@@ -31,11 +35,21 @@ public:
 
     // Ваш код здесь
 
+    template<typename... Types>
+    void EmplaceBack(Types... args) {
+        // books_.emplace_back(args...);
+        // books_.insert({args...});
+        Book book{args...};
+        books_.insert(book);
+    }
+
+    typename BookContainer::iterator begin() { return books_.begin(); }
+    typename BookContainer::iterator end()   { return books_.end();   }
+
 private:
     BookContainer books_;
     AuthorContainer authors_;
 };
-
 }  // namespace bookdb
 
 namespace std {

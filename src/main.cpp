@@ -1,9 +1,12 @@
 #include <algorithm>
 
-#include "book_database.hpp"
-#include "comparators.hpp"
-#include "filters.hpp"
-#include "statsistics.hpp"
+#include "../include/book_database.hpp"
+#include "../include/comparators.hpp"
+#include "../include/filters.hpp"
+#include "../include/statsistics.hpp"
+
+
+#include <iostream>
 
 using namespace bookdb;
 
@@ -18,8 +21,17 @@ int main() {
     //
 
     // Create a book database
-    BookDatabase<std::vector<Book>> db;
+    BookDatabase db;
+    db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
+    db.EmplaceBack("Animal Farm", "George Orwell", 1945, Genre::Fiction, 4.4, 143);
+    db.EmplaceBack("The Great Gatsby", "F. Scott Fitzgerald", 1925, Genre::Fiction, 4.5, 120);
+    db.EmplaceBack("Brave New World", "Aldous Huxley", 1932, Genre::SciFi, 4.5, 98);
 
+    std::sort(db.begin(), db.end(), comp::LessByAuthor{});
+
+    for (auto x : db) {
+        std::cout << x.author << std::endl;
+    }
     /*
 
     Код закомментирован, чтобы не приводить к ошибке компиляции

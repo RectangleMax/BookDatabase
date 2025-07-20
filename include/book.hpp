@@ -26,6 +26,9 @@ struct Book {
     int read_count;
 
     // Ваш код для конструкторов здесь
+    // db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
+    constexpr Book(std::string_view t, std::string_view a, int y, Genre g, double rating, int read_count):
+        title(t), author(a), year(y), genre(g), rating(rating), read_count(read_count) {}
 };
 }  // namespace bookdb
 
