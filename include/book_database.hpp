@@ -14,15 +14,14 @@
 
 namespace bookdb {
 
-// template <BookContainerLike BookContainer = std::vector<Book>> // 
-template <BookContainerLike BookContainer = boost::container::flat_multiset<Book, CompareByAuthor>>
+template <BookContainerLike BookContainer = std::vector<Book>> // 
 class BookDatabase {
 public:
     // Type aliases
 
     // Ваш код здесь
 
-    using AuthorContainer = std::set<std::string>; // BookContainer /* Ваш код здесь */;
+    using AuthorContainer = std::set<std::string, std::less<>>; // BookContainer /* Ваш код здесь */;
 
     BookDatabase() = default;
 
@@ -37,15 +36,14 @@ public:
 
     template<typename... Types>
     void EmplaceBack(Types... args) {
-        // books_.emplace_back(args...);
-        // books_.insert({args...});
-        Book book{args...};
-        books_.insert(book);
+        books_.emplace_back(args...);
     }
 
-    typename BookContainer::iterator begin() { return books_.begin(); }
-    typename BookContainer::iterator end()   { return books_.end();   }
-
+    typename BookContainer::iterator begin()  { return books_.begin();  }
+    typename BookContainer::iterator end()    { return books_.end();    }
+    typename BookContainer::const_iterator cbegin() const { return books_.cbegin(); }
+    typename BookContainer::const_iterator cend()   const { return books_.cend();   }
+    std::size_t size() const { return books_.size(); }
 private:
     BookContainer books_;
     AuthorContainer authors_;

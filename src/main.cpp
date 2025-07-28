@@ -32,6 +32,11 @@ int main() {
     for (auto x : db) {
         std::cout << x.author << std::endl;
     }
+
+    auto num_books_by_author = bookdb::buildAuthorHistogramFlat(db);
+    bookdb::displayAuthorHistogram(num_books_by_author);
+    std::cout << "general rating: " << bookdb::calculateAverageRating(db) << std::endl;
+
     /*
 
     Код закомментирован, чтобы не приводить к ошибке компиляции
