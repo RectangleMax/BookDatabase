@@ -34,7 +34,10 @@ int main() {
     }
 
     auto num_books_by_author = bookdb::buildAuthorHistogramFlat(db);
-    bookdb::displayAuthorHistogram(num_books_by_author);
+    bookdb::display___AuthorHistogram(num_books_by_author);
+    auto rating_by_genre = bookdb::calculateGenreRatings(db);
+    bookdb::display___GenreRatings(rating_by_genre);
+
     std::cout << "general rating: " << bookdb::calculateAverageRating(db) << std::endl;
 
     /*
