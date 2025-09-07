@@ -25,25 +25,38 @@ public:
 
     BookDatabase() = default;
 
+    BookDatabase(std::initializer_list<Book> init_list) : 
+        books_(init_list.begin(), init_list.end())  {}
+
+    
     void Clear() {
         books_.clear();
         authors_.clear();
     }
 
     // Standard container interface methods
-
-    // Ваш код здесь
+    using value_type = BookContainer::value_type;
+    typename BookContainer::iterator begin()  { return books_.begin();  }
+    typename BookContainer::iterator end()    { return books_.end();    }
+    typename BookContainer::const_iterator cbegin() const { return books_.cbegin(); }
+    typename BookContainer::const_iterator cend()   const { return books_.cend();   }
+    bool empty() const { return books_.empty(); }
+    void erase(BookContainer::iterator& it) { books_.erase(it); }
+    std::size_t size() const { return books_.size(); }
 
     template<typename... Types>
     void EmplaceBack(Types... args) {
         books_.emplace_back(args...);
     }
 
-    typename BookContainer::iterator begin()  { return books_.begin();  }
-    typename BookContainer::iterator end()    { return books_.end();    }
-    typename BookContainer::const_iterator cbegin() const { return books_.cbegin(); }
-    typename BookContainer::const_iterator cend()   const { return books_.cend();   }
-    std::size_t size() const { return books_.size(); }
+    void PushBack(const Book& book) {
+        books_.push_back(book);
+    }
+
+    void push_back(const Book& book) {
+        PushBack(book);
+    }
+
 private:
     BookContainer books_;
     AuthorContainer authors_;

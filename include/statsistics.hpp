@@ -64,12 +64,48 @@ sampleRandomBooks(const BookDatabase<T>& library, std::size_t sample_size) {
     }
     
     result.reserve(sample_size);
-    
-    // Используем std::sample с std::random_device
-    std::random_device rd;
     std::sample(library.cbegin(), library.cend(), std::back_inserter(result),
-               sample_size, std::mt19937{rd()});
+               sample_size, std::mt19937{std::random_device{}()});
     
+    return result;
+}
+
+template <BookContainerLike T>
+auto getTopNBy(BookDatabase<T>& library, std::size_t sample_size) 
+    -> std::vector<std::reference_wrapper<const typename BookDatabase<T>::value_type>> 
+{
+    using BookRef = std::reference_wrapper<const typename BookDatabase<T>::value_type>;
+    std::vector<BookRef> result;
+    
+    if (library.empty() || sample_size == 0) {
+        return result;
+    }
+    
+    // Создаем вектор ссылок на все книги
+    std::vector<BookRef> all_books;
+    all_books.reserve(library.size());
+    for (const auto& book : library) {
+        all_books.emplace_back(book);
+    }
+    
+    // Используем частичную сортировку для выбора топ-N элементов
+    if (sample_size >= library.size()) {
+        // Если нужно больше элементов, чем есть, возвращаем все отсортированные
+        std::sort(all_books.begin(), all_books.end(),
+                 [](const BookRef& a, const BookRef& b) {
+                     return a.get().rating > b.get().rating;
+                 });
+        return all_books;
+    }
+    
+    // Используем std::partial_sort для эффективного выбора топ-N
+    std::partial_sort(all_books.begin(), all_books.begin() + sample_size, all_books.end(),
+                     [](const BookRef& a, const BookRef& b) {
+                         return a.get().rating > b.get().rating;
+                     });
+    
+    // Копируем топ-N элементов в результат
+    result.assign(all_books.begin(), all_books.begin() + sample_size);
     return result;
 }
 
