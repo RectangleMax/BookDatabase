@@ -11,7 +11,11 @@ enum class Genre { Fiction, NonFiction, SciFi, Biography, Mystery, Unknown };
 // Ваш код для constexpr преобразования строк в enum::Genre и наоборот здесь
 
 constexpr Genre GenreFromString(std::string_view s) {
-    // Ваш код здесь
+    if (s == "Fiction") return Genre::Fiction;
+    if (s == "NonFiction") return Genre::NonFiction;
+    if (s == "SciFi") return Genre::SciFi;
+    if (s == "Biography") return Genre::Biography;
+    if (s == "Mystery") return Genre::Mystery;
     return Genre::Unknown;
 }
 
@@ -27,8 +31,10 @@ struct Book {
     auto operator<=>(const Book&) const = default;
     // Ваш код для конструкторов здесь
     // db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
-    constexpr Book(std::string_view t, std::string_view a, int y, Genre g, double rating, int read_count):
+    constexpr Book(std::string t, std::string_view a, int y, Genre g, double rating, int read_count):
         title(t), author(a), year(y), genre(g), rating(rating), read_count(read_count) {}
+    constexpr Book(std::string t, std::string_view a, int y, const std::string& g, double rating, int read_count):
+        Book(std::move(t), a, y, GenreFromString(g), rating, read_count) {}
 };
 }  // namespace bookdb
 
