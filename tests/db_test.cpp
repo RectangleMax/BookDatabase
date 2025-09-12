@@ -10,7 +10,7 @@ using namespace bookdb;
 
 BookDatabase<> get_base_for_tests() {
     BookDatabase base_1 { {"1984", "George Orwell", 1949, Genre::SciFi, 4., 190}, 
-                          {"Animal Farm", "George Orwell", 1945, Genre::Fiction, 4.4, 143} };
+                          {"Animal Farm", "George Orwell", 1945, "Fiction", 4.4, 143} };
     base_1.PushBack({"The Great Gatsby", "F. Scott Fitzgerald", 1925, Genre::Fiction, 4.5, 120});
     base_1.EmplaceBack("Brave New World", "Aldous Huxley", 1932, Genre::SciFi, 4.5, 98);
     return base_1;
@@ -55,4 +55,19 @@ TEST(TestComponentName, CheckTopRating) {
     BookDatabase topBase;
     std::copy(topBooksRef.begin(), topBooksRef.end(), std::back_inserter(topBase));
     EXPECT_DOUBLE_EQ(calculateAverageRating(topBase), 4.5);
+}
+
+TEST(TestComponentName, CheckFilters) {
+    auto filter_one = Combinators::any_of(
+        Filters::YearBetween(1947, 2020),
+        Filters::RatingAbove(4.45)
+    );
+    
+    auto filter_two = Combinators::all_of(
+        Filters::YearBetween(-5, 1930),
+        Filters::GenreIs("Fiction")
+    );
+
+    EXPECT_EQ(filterBooks(base.begin(), base.end(), filter_one).size(), 3);
+    EXPECT_EQ(filterBooks(base.begin(), base.end(), filter_two).size(), 1);
 }

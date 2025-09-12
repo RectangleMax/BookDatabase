@@ -34,11 +34,27 @@ int main() {
     }
 
     auto num_books_by_author = bookdb::buildAuthorHistogramFlat(db);
-    bookdb::display___AuthorHistogram(num_books_by_author);
     auto rating_by_genre = bookdb::calculateGenreRatings(db);
-    bookdb::display___GenreRatings(rating_by_genre);
 
     std::cout << "general rating: " << bookdb::calculateAverageRating(db) << std::endl;
+
+   
+
+    std::cout << std::endl;
+
+    auto filter = Combinators::any_of(
+        Filters::YearBetween(2000, 2020),
+        Filters::RatingAbove(4.3),
+        Filters::GenreIs("SciFi")
+    );
+
+    auto res = filterBooks(db.begin(), db.end(), filter);
+    // auto res = db;
+    db = BookDatabase();
+    int counter = 0;
+    std::cout << res.size() << std::endl;
+    std::for_each(res.begin(), res.end(), [&] (const Book& book_) { std:: cout << std::format("{}. {}", ++counter, book_) << std::endl; } );
+
 
     /*
 

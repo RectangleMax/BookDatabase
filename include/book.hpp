@@ -39,13 +39,13 @@ struct Book {
 }  // namespace bookdb
 
 namespace std {
+
 template <>
 struct formatter<bookdb::Genre, char> {
     template <typename FormatContext>
     auto format(const bookdb::Genre g, FormatContext &fc) const {
         std::string genre_str;
 
-        // clang-format off
         using bookdb::Genre;
         switch (g) {
             case Genre::Fiction:    genre_str = "Fiction"; break;
@@ -66,6 +66,26 @@ struct formatter<bookdb::Genre, char> {
     }
 };
 
-// Ваш код для std::formatter<Book> здесь
+
+template <>
+struct formatter<bookdb::Book> {
+    constexpr auto parse(format_parse_context& ctx) {
+        return ctx.begin();
+    }
+    
+    auto format(const bookdb::Book& book, format_context& ctx) const {
+        // Используем явные индексы для избежания ошибки
+        return format_to(
+            ctx.out(),
+            "{0}: {1} ({2}, {3}, rating {4}, reads {5})",
+            book.author,
+            book.title,
+            book.year,
+            book.genre,
+            book.rating,
+            book.read_count
+        );
+    }
+};
 
 }  // namespace std
