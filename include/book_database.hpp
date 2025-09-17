@@ -26,7 +26,12 @@ public:
     BookDatabase() = default;
 
     BookDatabase(std::initializer_list<Book> init_list) : 
-        books_(init_list.begin(), init_list.end())  {}
+                    books_(init_list.begin(), init_list.end())  {
+        std::for_each(books_.begin(), books_.end(), [this] (const auto& the_book) {
+            auto [it, is_emplaced] = authors_.emplace(the_book.author);
+            the_book.author = *it;
+        });
+    }
 
     
     void Clear() {
@@ -40,21 +45,35 @@ public:
     typename BookContainer::iterator end()    { return books_.end();    }
     typename BookContainer::const_iterator cbegin() const { return books_.cbegin(); }
     typename BookContainer::const_iterator cend()   const { return books_.cend();   }
+
+    using iterator =  BookContainer::iterator;
+
     bool empty() const { return books_.empty(); }
     void erase(BookContainer::iterator& it) { books_.erase(it); }
     std::size_t size() const { return books_.size(); }
 
-    template<typename... Types>
-    void EmplaceBack(Types... args) {
-        books_.emplace_back(args...);
+    template<typename... OtherArgs>
+    void EmplaceBack(const std::string& t, std::string_view a, OtherArgs&&... args) {
+        auto [it, is_emplaced] = authors_.emplace(a);
+        books_.emplace_back(t, *it, std::forward<OtherArgs>(args)...);
     }
 
     void PushBack(const Book& book) {
+        auto [it, is_emplaced] = authors_.emplace(book.author);
+        book.author = *it;
         books_.push_back(book);
     }
 
     void push_back(const Book& book) {
         PushBack(book);
+    }
+
+    const BookContainer& GetBooks() const {
+        return books_;
+    }
+
+    const AuthorContainer& GetAuthors() const {
+        return authors_;
     }
 
 private:
@@ -71,6 +90,8 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
         /*
         Раскомментируйте, когда bookdb::BookDatabase поддержит интерфейсы, доступные стандартным контейнерам
         (size/begin/...)
+        */ 
+        
 
         format_to(fc.out(), "BookDatabase (size = {}): ", db.size());
 
@@ -83,7 +104,6 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
         for (const auto &author : db.GetAuthors()) {
             format_to(fc.out(), "- {}\n", author);
         }
-        */
         return fc.out();
     }
 

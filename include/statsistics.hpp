@@ -11,7 +11,9 @@
 
 #include "book_database.hpp"
 
-#include <print>
+#include <format>
+#include <sstream>
+#include <iomanip>
 
 namespace bookdb {
 
@@ -22,6 +24,26 @@ auto buildAuthorHistogramFlat(const BookDatabase<T> &library, Comparator comp = 
     return num_books_by_author;
 }
 
+
+template <BookContainerLike T>
+void calculateGenreRatings(typename BookDatabase<T>::iterator begin, typename BookDatabase<T>::iterator end) {
+    int a;
+}
+    
+//     boost::container::flat_map<Genre, std::pair<double, std::size_t>> genreStats;
+//     std::for_each(library.cbegin(), library.cend(), [&genreStats] (const Book& book) { 
+//         auto& stats = genreStats[book.genre];
+//         stats.first += book.rating;
+//         ++stats.second;
+//     });
+
+//    boost::container::flat_map< Genre, double, std::less<> > average_rating_by_genre;
+//     std::transform(genreStats.cbegin(), genreStats.cend(), 
+//         std::inserter(average_rating_by_genre, average_rating_by_genre.begin()),
+//         [](const auto& pair) { return std::make_pair(pair.first, pair.second.first / pair.second.second); });
+
+//     return average_rating_by_genre;
+// }
 
 template <BookContainerLike T>
 auto calculateGenreRatings(const BookDatabase<T> &library) {
@@ -70,8 +92,8 @@ sampleRandomBooks(const BookDatabase<T>& library, std::size_t sample_size) {
     return result;
 }
 
-template <BookContainerLike T>
-auto getTopNBy(BookDatabase<T>& library, std::size_t sample_size) 
+template <BookContainerLike T, typename Comparator = comp::LessByPopularity>
+auto getTopNBy(BookDatabase<T>& library, std::size_t sample_size, Comparator comparator = comp::LessByPopularity {}) 
     -> std::vector<std::reference_wrapper<const typename BookDatabase<T>::value_type>> 
 {
     using BookRef = std::reference_wrapper<const typename BookDatabase<T>::value_type>;
@@ -91,18 +113,13 @@ auto getTopNBy(BookDatabase<T>& library, std::size_t sample_size)
     // Используем частичную сортировку для выбора топ-N элементов
     if (sample_size >= library.size()) {
         // Если нужно больше элементов, чем есть, возвращаем все отсортированные
-        std::sort(all_books.begin(), all_books.end(),
-                 [](const BookRef& a, const BookRef& b) {
-                     return a.get().rating > b.get().rating;
-                 });
+        std::sort(all_books.begin(), all_books.end(), comparator); //
         return all_books;
     }
     
     // Используем std::partial_sort для эффективного выбора топ-N
-    std::partial_sort(all_books.begin(), all_books.begin() + sample_size, all_books.end(),
-                     [](const BookRef& a, const BookRef& b) {
-                         return a.get().rating > b.get().rating;
-                     });
+    std::partial_sort(all_books.begin(), all_books.begin() + sample_size, 
+                all_books.end(), comparator);
     
     // Копируем топ-N элементов в результат
     result.assign(all_books.begin(), all_books.begin() + sample_size);
@@ -110,3 +127,43 @@ auto getTopNBy(BookDatabase<T>& library, std::size_t sample_size)
 }
 
 }  // namespace bookdb
+
+namespace std {
+
+template <>
+struct formatter<boost::container::flat_map< std::string, std::size_t, bookdb::TransparentStringLess >> {
+    constexpr auto parse(format_parse_context& ctx) {
+        return ctx.begin();
+    }
+    
+    auto format(const boost::container::flat_map< std::string, std::size_t, bookdb::TransparentStringLess >& num_books_by_author, format_context& ctx) const {
+        std::stringstream ss;
+        const int left_shift = 25;
+        const int right_shift = 7;
+        ss << "\n";
+        ss << std::setw(left_shift) << "Author" << " / number of books\n";
+        std::for_each(num_books_by_author.begin(), num_books_by_author.end(), 
+            [&ss] (const auto& pair) {ss << std::setw(left_shift) << pair.first << " / " << std::setw(right_shift) << pair.second << "\n"; });
+        return format_to(ctx.out(), "{}", ss.str());
+    }
+};
+
+// template <>
+// struct formatter< boost::container::flat_map< bookdb::Genre, double, std::less<>> > {
+//     constexpr auto parse(format_parse_context& ctx) {
+//         return ctx.begin();
+//     }
+    
+//     auto format(const boost::container::flat_map< bookdb::Genre, double, std::less<>>& average_rating_by_genre, format_context& ctx) const {
+//         std::stringstream ss;
+//         const int left_shift = 15;
+//         const int right_shift = 7;
+//         ss << "\n";
+//         ss << std::setw(left_shift) << "Genre" << " / Average rating\n";
+//         std::for_each(average_rating_by_genre.begin(), average_rating_by_genre.end(), 
+//             [&ss] (const auto& pair) {ss << std::setw(left_shift) << pair.first << " / " << std::setw(right_shift) << pair.second << "\n"; });
+//         return format_to(ctx.out(), "{}", ss.str());
+//     }
+// };
+
+}

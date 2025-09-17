@@ -21,7 +21,7 @@ constexpr Genre GenreFromString(std::string_view s) {
 
 struct Book {
     // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом контейнере
-    std::string_view author;
+    mutable std::string_view author;
     std::string title;
 
     int year;
@@ -29,11 +29,11 @@ struct Book {
     double rating;
     int read_count;
     auto operator<=>(const Book&) const = default;
+
     // Ваш код для конструкторов здесь
-    // db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
-    constexpr Book(std::string t, std::string_view a, int y, Genre g, double rating, int read_count):
+    constexpr Book(const std::string& t, std::string_view a, int y, Genre g, double rating, int read_count):
         title(t), author(a), year(y), genre(g), rating(rating), read_count(read_count) {}
-    constexpr Book(std::string t, std::string_view a, int y, const std::string& g, double rating, int read_count):
+    constexpr Book(const std::string& t, std::string_view a, int y, const std::string& g, double rating, int read_count):
         Book(std::move(t), a, y, GenreFromString(g), rating, read_count) {}
 };
 }  // namespace bookdb
@@ -74,7 +74,6 @@ struct formatter<bookdb::Book> {
     }
     
     auto format(const bookdb::Book& book, format_context& ctx) const {
-        // Используем явные индексы для избежания ошибки
         return format_to(
             ctx.out(),
             "{0}: {1} ({2}, {3}, rating {4}, reads {5})",

@@ -9,6 +9,8 @@
 #include <iostream>
 
 using namespace bookdb;
+using namespace bookdb::Filters;
+using namespace bookdb::Combinators;
 
 int main() {
     //
@@ -21,44 +23,11 @@ int main() {
     //
 
     // Create a book database
-    BookDatabase db;
-    db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
-    db.EmplaceBack("Animal Farm", "George Orwell", 1945, Genre::Fiction, 4.4, 143);
-    db.EmplaceBack("The Great Gatsby", "F. Scott Fitzgerald", 1925, Genre::Fiction, 4.5, 120);
-    db.EmplaceBack("Brave New World", "Aldous Huxley", 1932, Genre::SciFi, 4.5, 98);
-
-    std::sort(db.begin(), db.end(), comp::LessByAuthor{});
-
-    for (auto x : db) {
-        std::cout << x.author << std::endl;
-    }
-
-    auto num_books_by_author = bookdb::buildAuthorHistogramFlat(db);
-    auto rating_by_genre = bookdb::calculateGenreRatings(db);
-
-    std::cout << "general rating: " << bookdb::calculateAverageRating(db) << std::endl;
-
-   
-
-    std::cout << std::endl;
-
-    auto filter = Combinators::any_of(
-        Filters::YearBetween(2000, 2020),
-        Filters::RatingAbove(4.3),
-        Filters::GenreIs("SciFi")
-    );
-
-    auto res = filterBooks(db.begin(), db.end(), filter);
-    // auto res = db;
-    db = BookDatabase();
-    int counter = 0;
-    std::cout << res.size() << std::endl;
-    std::for_each(res.begin(), res.end(), [&] (const Book& book_) { std:: cout << std::format("{}. {}", ++counter, book_) << std::endl; } );
-
+    BookDatabase<std::vector<Book>> db;
 
     /*
-
     Код закомментирован, чтобы не приводить к ошибке компиляции
+    */
 
     // Add some books
     db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
@@ -68,7 +37,7 @@ int main() {
     db.EmplaceBack("Pride and Prejudice", "Jane Austen", 1813, Genre::Fiction, 4.7, 178);
     db.EmplaceBack("The Catcher in the Rye", "J.D. Salinger", 1951, Genre::Fiction, 4.3, 112);
     db.EmplaceBack("Brave New World", "Aldous Huxley", 1932, Genre::SciFi, 4.5, 98);
-    db.EmplaceBack("Jane Eyre", "Charlotte Brontë", 1847, Genre::Fiction, 4.6, 110);
+    db.EmplaceBack("Jane Eyre", "Charlotte Bronte", 1847, Genre::Fiction, 4.6, 110);
     db.EmplaceBack("The Hobbit", "J.R.R. Tolkien", 1937, Genre::Fiction, 4.9, 203);
     db.EmplaceBack("Lord of the Flies", "William Golding", 1954, Genre::Fiction, 4.2, 89);
     std::print("Books: {}\n\n", db);
@@ -85,8 +54,8 @@ int main() {
     std::print("Author histogram: {}", histogram);
 
     // Ratings
-    auto genreRatings = calculateGenreRatings(db.begin(), db.end());
-    std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
+    // auto genreRatings = calculateGenreRatings(db.begin(), db.end());
+    // std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
 
     auto avrRating = calculateAverageRating(db);
     std::print("Average books rating in library: {}\n", avrRating);
@@ -105,7 +74,6 @@ int main() {
     if (orwellBookIt != db.end()) {
         std::print("\n\nTransparent lookup by authors. Found Orwell's book: {}\n", *orwellBookIt);
     }
-    */
 
     return 0;
 }
