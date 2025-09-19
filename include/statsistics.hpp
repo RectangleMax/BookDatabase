@@ -27,13 +27,9 @@ auto buildAuthorHistogramFlat(const BookDatabase<T> &library, Comparator comp = 
 }
 
 
-// template<BookIterator Iterator, BookSentinel Sentiel>
-// auto calculateGenreRatings(Iterator begin_, Iterator end_) {
-
-template <BookContainerLike T>
-auto calculateGenreRatings(typename BookDatabase<T>::const_iterator begin_, typename BookDatabase<T>::const_iterator end_) {
-
-    
+template<BookIterator Iterator>
+auto calculateGenreRatings(Iterator begin_, Iterator end_) {
+   
     boost::container::flat_map<Genre, std::pair<double, std::size_t>> genreStats;
     std::for_each(begin_, end_, [&genreStats] (const Book& book) { 
         auto& stats = genreStats[book.genre];
@@ -134,28 +130,30 @@ struct formatter<boost::container::flat_map< std::string, std::size_t, bookdb::T
         const int right_shift = 7;
         ss << "\n";
         ss << std::setw(left_shift) << "Author" << " / number of books\n";
+        ss << "----------------------------------------------\n";
         std::for_each(num_books_by_author.begin(), num_books_by_author.end(), 
             [&ss] (const auto& pair) {ss << std::setw(left_shift) << pair.first << " / " << std::setw(right_shift) << pair.second << "\n"; });
         return format_to(ctx.out(), "{}", ss.str());
     }
 };
 
-// template <>
-// struct formatter< boost::container::flat_map< bookdb::Genre, double, std::less<>> > {
-//     constexpr auto parse(format_parse_context& ctx) {
-//         return ctx.begin();
-//     }
+template <>
+struct formatter< boost::container::flat_map< bookdb::Genre, double, std::less<>> > {
+    constexpr auto parse(format_parse_context& ctx) {
+        return ctx.begin();
+    }
     
-//     auto format(const boost::container::flat_map< bookdb::Genre, double, std::less<>>& average_rating_by_genre, format_context& ctx) const {
-//         std::stringstream ss;
-//         const int left_shift = 15;
-//         const int right_shift = 7;
-//         ss << "\n";
-//         ss << std::setw(left_shift) << "Genre" << " / Average rating\n";
-//         std::for_each(average_rating_by_genre.begin(), average_rating_by_genre.end(), 
-//             [&ss] (const auto& pair) {ss << std::setw(left_shift) << pair.first << " / " << std::setw(right_shift) << pair.second << "\n"; });
-//         return format_to(ctx.out(), "{}", ss.str());
-//     }
-// };
+    auto format(const boost::container::flat_map< bookdb::Genre, double, std::less<>>& average_rating_by_genre, format_context& ctx) const {
+        std::stringstream ss;
+        const int left_shift = 15;
+        const int right_shift = 7;
+        ss << "\n";
+        ss << std::setw(left_shift) << "Genre" << " / Average rating\n";
+        ss << "----------------------------------------------\n";
+        std::for_each(average_rating_by_genre.begin(), average_rating_by_genre.end(), 
+            [&ss] (const auto& pair) {ss << std::setw(left_shift) << std::format("{}", pair.first) << " / " << std::setw(right_shift) << pair.second << "\n"; });
+        return format_to(ctx.out(), "{}", ss.str());
+    }
+};
 
 }

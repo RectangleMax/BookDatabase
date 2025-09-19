@@ -55,7 +55,7 @@ int main() {
 
     // Ratings
     auto genreRatings = calculateGenreRatings(db.cbegin(), db.cend());
-    // std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
+    std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
 
     auto avrRating = calculateAverageRating(db);
     std::print("Average books rating in library: {}\n", avrRating);
