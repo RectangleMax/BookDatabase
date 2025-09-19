@@ -40,13 +40,15 @@ public:
     }
 
     // Standard container interface methods
-    using value_type = BookContainer::value_type;
-    typename BookContainer::iterator begin()  { return books_.begin();  }
-    typename BookContainer::iterator end()    { return books_.end();    }
-    typename BookContainer::const_iterator cbegin() const { return books_.cbegin(); }
-    typename BookContainer::const_iterator cend()   const { return books_.cend();   }
+    using value_type = typename BookContainer::value_type;
+    using iterator =  typename BookContainer::iterator;
+    using const_iterator =  typename BookContainer::const_iterator;
+    iterator begin()  { return books_.begin();  }
+    iterator end()    { return books_.end();    }
+    const_iterator cbegin() const { return books_.cbegin(); }
+    const_iterator cend()   const { return books_.cend();   }
 
-    using iterator =  BookContainer::iterator;
+    
 
     bool empty() const { return books_.empty(); }
     void erase(BookContainer::iterator& it) { books_.erase(it); }

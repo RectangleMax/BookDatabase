@@ -15,6 +15,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "concepts.hpp"
+
 namespace bookdb {
 
 template <BookContainerLike T, typename Comparator = TransparentStringLess>
@@ -25,30 +27,15 @@ auto buildAuthorHistogramFlat(const BookDatabase<T> &library, Comparator comp = 
 }
 
 
+// template<BookIterator Iterator, BookSentinel Sentiel>
+// auto calculateGenreRatings(Iterator begin_, Iterator end_) {
+
 template <BookContainerLike T>
-void calculateGenreRatings(typename BookDatabase<T>::iterator begin, typename BookDatabase<T>::iterator end) {
-    int a;
-}
+auto calculateGenreRatings(typename BookDatabase<T>::const_iterator begin_, typename BookDatabase<T>::const_iterator end_) {
+
     
-//     boost::container::flat_map<Genre, std::pair<double, std::size_t>> genreStats;
-//     std::for_each(library.cbegin(), library.cend(), [&genreStats] (const Book& book) { 
-//         auto& stats = genreStats[book.genre];
-//         stats.first += book.rating;
-//         ++stats.second;
-//     });
-
-//    boost::container::flat_map< Genre, double, std::less<> > average_rating_by_genre;
-//     std::transform(genreStats.cbegin(), genreStats.cend(), 
-//         std::inserter(average_rating_by_genre, average_rating_by_genre.begin()),
-//         [](const auto& pair) { return std::make_pair(pair.first, pair.second.first / pair.second.second); });
-
-//     return average_rating_by_genre;
-// }
-
-template <BookContainerLike T>
-auto calculateGenreRatings(const BookDatabase<T> &library) {
     boost::container::flat_map<Genre, std::pair<double, std::size_t>> genreStats;
-    std::for_each(library.cbegin(), library.cend(), [&genreStats] (const Book& book) { 
+    std::for_each(begin_, end_, [&genreStats] (const Book& book) { 
         auto& stats = genreStats[book.genre];
         stats.first += book.rating;
         ++stats.second;
@@ -60,6 +47,11 @@ auto calculateGenreRatings(const BookDatabase<T> &library) {
         [](const auto& pair) { return std::make_pair(pair.first, pair.second.first / pair.second.second); });
 
     return average_rating_by_genre;
+}
+
+template <BookContainerLike T>
+auto calculateGenreRatings(const BookDatabase<T> &library) {
+    return calculateGenreRatings(library.cbegin(), library.cend());
 }
 
 

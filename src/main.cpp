@@ -54,7 +54,7 @@ int main() {
     std::print("Author histogram: {}", histogram);
 
     // Ratings
-    // auto genreRatings = calculateGenreRatings(db.begin(), db.end());
+    auto genreRatings = calculateGenreRatings(db.cbegin(), db.cend());
     // std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
 
     auto avrRating = calculateAverageRating(db);
