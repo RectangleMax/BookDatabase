@@ -1,11 +1,16 @@
 #include <algorithm>
 
-#include "book_database.hpp"
-#include "comparators.hpp"
-#include "filters.hpp"
-#include "statsistics.hpp"
+#include "../include/book_database.hpp"
+#include "../include/comparators.hpp"
+#include "../include/filters.hpp"
+#include "../include/statsistics.hpp"
+
+
+#include <iostream>
 
 using namespace bookdb;
+using namespace bookdb::Filters;
+using namespace bookdb::Combinators;
 
 int main() {
     //
@@ -21,8 +26,8 @@ int main() {
     BookDatabase<std::vector<Book>> db;
 
     /*
-
     Код закомментирован, чтобы не приводить к ошибке компиляции
+    */
 
     // Add some books
     db.EmplaceBack("1984", "George Orwell", 1949, Genre::SciFi, 4., 190);
@@ -32,7 +37,7 @@ int main() {
     db.EmplaceBack("Pride and Prejudice", "Jane Austen", 1813, Genre::Fiction, 4.7, 178);
     db.EmplaceBack("The Catcher in the Rye", "J.D. Salinger", 1951, Genre::Fiction, 4.3, 112);
     db.EmplaceBack("Brave New World", "Aldous Huxley", 1932, Genre::SciFi, 4.5, 98);
-    db.EmplaceBack("Jane Eyre", "Charlotte Brontë", 1847, Genre::Fiction, 4.6, 110);
+    db.EmplaceBack("Jane Eyre", "Charlotte Bronte", 1847, Genre::Fiction, 4.6, 110);
     db.EmplaceBack("The Hobbit", "J.R.R. Tolkien", 1937, Genre::Fiction, 4.9, 203);
     db.EmplaceBack("Lord of the Flies", "William Golding", 1954, Genre::Fiction, 4.2, 89);
     std::print("Books: {}\n\n", db);
@@ -49,7 +54,7 @@ int main() {
     std::print("Author histogram: {}", histogram);
 
     // Ratings
-    auto genreRatings = calculateGenreRatings(db.begin(), db.end());
+    auto genreRatings = calculateGenreRatings(db.cbegin(), db.cend());
     std::print("\n\nAverage ratings by genres: {}\n", genreRatings);
 
     auto avrRating = calculateAverageRating(db);
@@ -69,7 +74,6 @@ int main() {
     if (orwellBookIt != db.end()) {
         std::print("\n\nTransparent lookup by authors. Found Orwell's book: {}\n", *orwellBookIt);
     }
-    */
 
     return 0;
 }
